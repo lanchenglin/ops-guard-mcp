@@ -4,4 +4,4 @@
 
 当前版本：`0.2.2`（2026-08-26）
 
-> Initial public bootstrap. The complete v0.2.2 source tree is committed in the next commit.
+> 发布提交已准备完成，完整文档、Docker Compose、独立 DingTalk Stream、Hermes bridge、Remote Agent、测试与安全模型均随仓库发布。
