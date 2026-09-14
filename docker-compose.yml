@@ -1,0 +1,71 @@
+name: ops-guard
+
+services:
+  ops-guard:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ops-guard-mcp:0.2.2
+    container_name: ops-guard
+    restart: unless-stopped
+    init: true
+    user: "10001:10001"
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 256
+    mem_limit: 512m
+    cpus: 1.0
+    env_file:
+      - ./docker/.env
+    environment:
+      OPS_GUARD_CONFIG: /etc/ops-guard/ops-guard.toml
+      OPS_GUARD_LOG_LEVEL: ${OPS_GUARD_LOG_LEVEL:-INFO}
+      HOME: /tmp
+    volumes:
+      - ops_guard_state:/var/lib/ops-guard
+      - ./docker/ops-guard.toml:/etc/ops-guard/ops-guard.toml:ro
+      - ./docker/ssh:/etc/ops-guard/ssh:ro
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,size=64m,mode=1777
+      - /run:rw,noexec,nosuid,nodev,size=16m,mode=0755
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8765/health', timeout=2).read()"
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  dingtalk-discover:
+    profiles:
+      - tools
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ops-guard-mcp:0.2.2
+    user: "10001:10001"
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    env_file:
+      - ./docker/.env
+    environment:
+      HOME: /tmp
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,size=32m,mode=1777
+    entrypoint:
+      - python
+      - /opt/ops-guard/scripts/dingtalk-discover-context.py
+    command: []
+
+volumes:
+  ops_guard_state:
+    name: ops-guard-state

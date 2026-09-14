@@ -1,0 +1,4 @@
+# Replace 'hermes' if your Hermes service account uses another OS user.
+# Install with: visudo -cf /etc/sudoers.d/ops-guard-mcp
+# The wrapper itself rejects all arguments and must be root-owned/non-writable.
+hermes ALL=(root) NOPASSWD: /usr/local/sbin/ops-guard-mcp-stdio

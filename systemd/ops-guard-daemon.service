@@ -1,0 +1,26 @@
+[Unit]
+Description=Ops Guard approval service and execution worker
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=ops-guard-gateway
+Group=ops-guard-gateway
+WorkingDirectory=/opt/ops-guard-mcp
+EnvironmentFile=/etc/ops-guard/gateway.env
+ExecStart=/opt/ops-guard-mcp/.venv/bin/ops-guard-daemon --config /etc/ops-guard/gateway.toml
+Restart=on-failure
+RestartSec=3
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+ReadWritePaths=/var/lib/ops-guard
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+LockPersonality=true
+MemoryDenyWriteExecute=true
+
+[Install]
+WantedBy=multi-user.target

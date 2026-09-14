@@ -21,11 +21,21 @@ classifiers = [
   "Topic :: System :: Systems Administration",
   "Topic :: Security",
 ]
-dependencies = ["mcp>=2.0.0,<3"]
+dependencies = [
+  "mcp>=2.0.0,<3",
+]
 
 [project.optional-dependencies]
-dingtalk = ["dingtalk-stream>=0.20,<0.25"]
-dev = ["build>=1.2", "pytest>=8.3", "pytest-asyncio>=0.24", "ruff>=0.9", "mypy>=1.14"]
+dingtalk = [
+  "dingtalk-stream>=0.20,<0.25",
+]
+dev = [
+  "build>=1.2",
+  "pytest>=8.3",
+  "pytest-asyncio>=0.24",
+  "ruff>=0.9",
+  "mypy>=1.14",
+]
 
 [project.scripts]
 ops-guard = "ops_guard.cli:main"
@@ -49,7 +59,13 @@ target-version = "py311"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP", "S"]
-ignore = ["E501", "S108", "S310", "S603", "S607"]
+ignore = [
+  "E501", # long regex/rule tables are clearer when kept together
+  "S108", # /tmp is an explicit constrained work root in examples and defaults
+  "S310", # DingTalk URL is administrator configuration and uses a bounded timeout
+  "S603", # all subprocess calls use structured argv and shell=False
+  "S607", # executable trust is enforced by Agent/runtime configuration
+]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["S101"]

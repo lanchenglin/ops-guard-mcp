@@ -1,5 +1,7 @@
 [agent]
 host_id = "prod-web-01"
+# Environment takes precedence. For sshd ForceCommand deployments, a root-owned/agent-readable
+# 0600 secret file is usually easier than AcceptEnv.
 secret_env = "OPS_GUARD_AGENT_SECRET"
 secret_file = "/etc/ops-guard/agent.secret"
 nonce_db = "/var/lib/ops-guard/nonces.sqlite3"
@@ -7,7 +9,16 @@ allowed_read_roots = ["/var/log/nginx", "/var/log/app"]
 allowed_workdirs = ["/tmp/ops-guard"]
 default_workdir = "/tmp/ops-guard"
 allow_scripts = false
-trusted_executable_dirs = ["/usr/local/sbin", "/usr/local/bin", "/usr/sbin", "/usr/bin", "/sbin", "/bin"]
+# argv[0] is resolved only inside these administrator-owned directories. The Agent rejects
+# shadow binaries and any executable/directory writable by the Agent OS account.
+trusted_executable_dirs = [
+  "/usr/local/sbin",
+  "/usr/local/bin",
+  "/usr/sbin",
+  "/usr/bin",
+  "/sbin",
+  "/bin",
+]
 max_timeout_seconds = 60
 max_output_bytes = 1048576
 

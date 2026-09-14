@@ -1,0 +1,21 @@
+#!/bin/sh
+# Root-owned fixed launcher for Hermes host integration.
+# Install this file as /usr/local/sbin/ops-guard-mcp-stdio and allow only this
+# exact wrapper through sudo. Do NOT add the Hermes user to the docker group.
+set -eu
+
+if [ "$#" -ne 0 ]; then
+  echo "ops-guard-mcp-stdio accepts no arguments" >&2
+  exit 64
+fi
+
+DOCKER_BIN=/usr/bin/docker
+if [ ! -x "$DOCKER_BIN" ]; then
+  echo "docker binary not found at $DOCKER_BIN" >&2
+  exit 69
+fi
+
+# Do not inherit DOCKER_HOST/DOCKER_CONTEXT/TLS settings from the caller.
+# The fixed local Docker daemon and fixed container/command are the only path.
+exec /usr/bin/env -i PATH=/usr/bin:/bin HOME=/root \
+  "$DOCKER_BIN" exec -i ops-guard ops-guard-mcp

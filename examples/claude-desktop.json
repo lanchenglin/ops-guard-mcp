@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "ops-guard": {
+      "command": "/ABSOLUTE/PATH/ops-guard-mcp/.venv/bin/ops-guard-mcp",
+      "env": {
+        "OPS_GUARD_CONFIG": "/ABSOLUTE/PATH/ops-guard-mcp/config/ops-guard.toml",
+        "OPS_GUARD_APPROVAL_SECRET": "replace-with-at-least-32-random-characters",
+        "OPS_GUARD_AGENT_SECRET_LOCAL": "replace-with-at-least-32-random-characters"
+      }
+    }
+  }
+}

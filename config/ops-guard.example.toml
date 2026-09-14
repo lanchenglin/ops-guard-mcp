@@ -1,0 +1,86 @@
+[server]
+# Relative paths are resolved from this TOML file.
+state_dir = "../state"
+approval_base_url = "http://127.0.0.1:8765"
+approval_link_secret_env = "OPS_GUARD_APPROVAL_SECRET"
+request_ttl_seconds = 300
+auto_execute_on_approval = true
+bind_host = "127.0.0.1"
+bind_port = 8765
+# Production recommendation: put the approval endpoint behind an identity-aware reverse proxy
+# and set the header name it injects after authentication.
+# trusted_approver_header = "X-Authenticated-User"
+
+[dingtalk]
+# false by default. For Hermes same-conversation approval use interactive mode.
+enabled = false
+# webhook    = legacy custom robot -> signed external confirmation page
+# interactive = DingTalk enterprise-bot interactive card in the same DM/group
+# hybrid     = interactive first, legacy webhook fallback
+mode = "interactive"
+
+# REST credentials used by Ops Guard to create/deliver interactive cards.
+client_id_env = "OPS_GUARD_DINGTALK_CLIENT_ID"
+client_secret_env = "OPS_GUARD_DINGTALK_CLIENT_SECRET"
+card_template_id = "YOUR_DINGTALK_CARD_TEMPLATE_ID"
+
+# Recommended when Hermes already owns the DingTalk Stream connection.
+# Hermes' deterministic platform adapter forwards the authenticated card callback to Ops Guard.
+callback_owner = "hermes"
+bridge_secret_env = "OPS_GUARD_HERMES_BRIDGE_SECRET"
+bridge_max_age_seconds = 60
+
+# Only these DingTalk user IDs may approve. Keep this non-empty in production.
+allowed_approver_user_ids = []
+# Also require the clicking user to match the user bound to the originating conversation/default.
+require_context_sender_match = true
+at_requester = true
+
+# Single-user Hermes DM convenience. If set, the MCP tool does not need approval_context.
+# default_conversation_type = "1"
+# default_sender_staff_id = "manager1234"
+# default_sender_nick = "运维管理员"
+# For a fixed group instead:
+# default_conversation_type = "2"
+# default_sender_staff_id = "manager1234"
+# default_conversation_id = "cidXXXXXXXX"
+
+# Legacy custom-robot fallback settings (needed by webhook/hybrid mode only).
+webhook_url_env = "OPS_GUARD_DINGTALK_WEBHOOK"
+secret_env = "OPS_GUARD_DINGTALK_SECRET"
+timeout_seconds = 10
+
+# Development-only target. It still passes through the same signed agent envelope and nonce DB,
+# but executes through an in-process local AgentRuntime rather than SSH.
+[[hosts]]
+id = "local-dev"
+environment = "dev"
+transport = "local-agent"
+approve_sensitive_reads = false
+allow_scripts = true
+allowed_read_roots = ["/var/log", "/etc", "/tmp"]
+allowed_workdirs = ["/tmp"]
+default_workdir = "/tmp"
+timeout_seconds = 30
+max_output_bytes = 1048576
+agent_secret_env = "OPS_GUARD_AGENT_SECRET_LOCAL"
+
+# Production SSH example. Uncomment and edit.
+# [[hosts]]
+# id = "prod-web-01"
+# environment = "prod"
+# transport = "ssh-agent"
+# approve_sensitive_reads = false
+# allow_scripts = false
+# allowed_read_roots = ["/var/log/nginx", "/var/log/app"]
+# allowed_workdirs = ["/tmp/ops-guard"]
+# default_workdir = "/tmp/ops-guard"
+# timeout_seconds = 45
+# max_output_bytes = 1048576
+# ssh_host = "10.0.0.21"
+# ssh_user = "ops-guard"
+# ssh_port = 22
+# identity_file = "../secrets/ops-guard-prod-web-01"
+# known_hosts_file = "../secrets/known_hosts"
+# remote_command = ["/opt/ops-guard/bin/ops-guard-agent", "--config", "/etc/ops-guard/agent.toml", "execute"]
+# agent_secret_env = "OPS_GUARD_AGENT_SECRET_PROD_WEB_01"

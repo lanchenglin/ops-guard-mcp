@@ -1,0 +1,32 @@
+Ops Guard MCP v0.2.2 - DingTalk Same-Conversation + Standalone Stream Approval
+
+优先阅读：
+1. README.md
+2. docs/HERMES_DINGTALK.md
+3. docs/DINGTALK_STANDALONE_STREAM.md
+4. docs/ARCHITECTURE.md
+5. docs/SECURITY_MODEL.md
+6. integrations/hermes/HERMES_PATCH.md
+7. integrations/dingtalk/CARD_TEMPLATE.md
+
+本地测试：
+  python3 -m venv .venv
+  source .venv/bin/activate
+  pip install -e .
+  cp config/ops-guard.example.toml config/ops-guard.toml
+  PYTHONPATH=src python -m unittest discover -s tests -v
+
+Hermes 推荐模式：
+  dingtalk.mode = "interactive"
+  dingtalk.callback_owner = "hermes"
+
+此模式下只有 Hermes 持有 DingTalk Stream；Ops Guard 通过 REST 投放卡片，Hermes 的确定性 callback handler 将真实 userId 的卡片点击签名转给 Ops Guard。LLM 没有 approve 工具。
+
+
+独立审批机器人模式：
+  dingtalk.mode = "interactive"
+  dingtalk.callback_owner = "ops_guard"
+  使用独立 DingTalk Client ID / Secret。
+  首次部署请完整阅读 docs/DINGTALK_STANDALONE_STREAM.md。
+
+Docker / Docker Compose 独立 Stream 部署：docs/DOCKER_COMPOSE_STANDALONE.md

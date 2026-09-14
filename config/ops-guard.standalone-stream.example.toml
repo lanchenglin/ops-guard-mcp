@@ -1,0 +1,79 @@
+# Ops Guard MCP v0.2.2 - standalone DingTalk Stream deployment example
+#
+# Recommended first-deployment workflow:
+#   1. Keep auto_execute_on_approval=false until the card callback path is verified.
+#   2. Use a dedicated DingTalk enterprise app for Ops Guard approval.
+#   3. Do not run Hermes Stream with the same DingTalk Client ID/Secret.
+
+[server]
+state_dir = "/var/lib/ops-guard"
+approval_base_url = "http://127.0.0.1:8765"
+approval_link_secret_env = "OPS_GUARD_APPROVAL_SECRET"
+request_ttl_seconds = 300
+# FIRST DEPLOYMENT: keep false. After approval-only validation, change to true.
+auto_execute_on_approval = false
+bind_host = "127.0.0.1"
+bind_port = 8765
+
+[dingtalk]
+enabled = true
+mode = "interactive"
+
+# Dedicated Ops Guard DingTalk enterprise app credentials.
+client_id_env = "OPS_GUARD_DINGTALK_CLIENT_ID"
+client_secret_env = "OPS_GUARD_DINGTALK_CLIENT_SECRET"
+card_template_id = "YOUR_DINGTALK_CARD_TEMPLATE_ID"
+
+# Ops Guard daemon owns the DingTalk Stream connection.
+callback_owner = "ops_guard"
+
+# Mandatory in production. These values are DingTalk userId/staffId values.
+allowed_approver_user_ids = ["YOUR_APPROVER_USER_ID"]
+
+# Fixed approval group with one or more allowed approvers:
+# false = authorization is decided by allowed_approver_user_ids.
+require_context_sender_match = false
+at_requester = true
+
+default_conversation_type = "2"
+# Required by current delivery-context model; for group mode this value is used for @ requester
+# and is NOT the authorization list when require_context_sender_match=false.
+default_sender_staff_id = "YOUR_PRIMARY_APPROVER_USER_ID"
+default_sender_nick = "运维审批人"
+default_conversation_id = "YOUR_APPROVAL_GROUP_CONVERSATION_ID"
+
+timeout_seconds = 10
+
+# First card-path test target. With auto_execute_on_approval=false, approval will not execute it.
+[[hosts]]
+id = "local-dev"
+environment = "dev"
+transport = "local-agent"
+approve_sensitive_reads = false
+allow_scripts = false
+allowed_read_roots = ["/var/log", "/etc", "/tmp"]
+allowed_workdirs = ["/tmp"]
+default_workdir = "/tmp"
+timeout_seconds = 30
+max_output_bytes = 1048576
+agent_secret_env = "OPS_GUARD_AGENT_SECRET_LOCAL"
+
+# Production SSH example. Enable only after the standalone approval path is verified.
+# [[hosts]]
+# id = "prod-web-01"
+# environment = "prod"
+# transport = "ssh-agent"
+# approve_sensitive_reads = false
+# allow_scripts = false
+# allowed_read_roots = ["/var/log/nginx", "/var/log/app"]
+# allowed_workdirs = ["/tmp/ops-guard"]
+# default_workdir = "/tmp/ops-guard"
+# timeout_seconds = 45
+# max_output_bytes = 1048576
+# ssh_host = "10.0.0.21"
+# ssh_user = "ops-guard"
+# ssh_port = 22
+# identity_file = "/etc/ops-guard/keys/prod-web-01"
+# known_hosts_file = "/etc/ops-guard/known_hosts"
+# remote_command = ["/opt/ops-guard/bin/ops-guard-agent", "--config", "/etc/ops-guard/agent.toml", "execute"]
+# agent_secret_env = "OPS_GUARD_AGENT_SECRET_PROD_WEB_01"
