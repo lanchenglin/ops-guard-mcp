@@ -1,0 +1,50 @@
+# Ops Guard AI deployment parameter template.
+# Copy values into the AI conversation or to an UNTRACKED deployment file.
+# Never commit real secrets.
+
+project:
+  repo_url: "https://github.com/lanchenglin/ops-guard-mcp.git"
+  branch: "main"
+  deploy_mode: "docker_compose"          # docker_compose | systemd
+  approval_mode: "standalone_stream"     # standalone_stream recommended
+  install_dir: "/opt/ops-guard-mcp"
+
+gateway:
+  host: "YOUR_GATEWAY_HOST"
+  ssh_port: 22
+  ssh_user: "YOUR_DEPLOY_SSH_USER"
+
+dingtalk:
+  client_id: "YOUR_OPS_GUARD_DINGTALK_CLIENT_ID"
+  # client_secret must be supplied to the AI as a secret/runtime value.
+  client_secret: "SECRET_RUNTIME_ONLY"
+  card_template_id: "YOUR_CARD_TEMPLATE_ID"
+  approver_user_ids:
+    - "YOUR_APPROVER_USER_ID"
+  primary_approver_user_id: "YOUR_PRIMARY_APPROVER_USER_ID"
+  approval_group_conversation_id: "YOUR_APPROVAL_GROUP_CONVERSATION_ID"
+
+security:
+  auto_execute_after_validation: false
+  approval_http_public: false
+  remote_agent_allow_scripts: false
+
+hermes:
+  connect_mcp: true
+  # For same-host Hermes, use the fixed stdio wrapper described in the runbook.
+  gateway_same_host: true
+
+remote_hosts:
+  # Add only when the user wants Ops Guard to manage a real server.
+  # - host_id: "prod-web-01"
+  #   environment: "prod"
+  #   ssh_host: "10.0.0.21"
+  #   ssh_port: 22
+  #   ssh_user: "ops-guard"
+  #   allowed_read_roots:
+  #     - "/var/log/nginx"
+  #     - "/var/log/app"
+  #   allowed_workdirs:
+  #     - "/tmp/ops-guard"
+  #   default_workdir: "/tmp/ops-guard"
+  []
