@@ -183,6 +183,31 @@ ops-guard-daemon --config "$OPS_GUARD_CONFIG"
 ops-guard-mcp
 ```
 
+## AI / Hermes 自动部署入口
+
+如果希望让 Hermes、Codex、Claude Code 或其他 AI 直接读取仓库后完成部署，先让它读取：
+
+- [`AGENTS.md`](AGENTS.md) —— AI 入口与强制安全约束；
+- [`docs/AI_DEPLOYMENT_RUNBOOK.md`](docs/AI_DEPLOYMENT_RUNBOOK.md) —— 从参数检查、Docker Compose、独立 Stream、审批-only smoke test、Remote Agent 到 Hermes MCP 接入的完整执行 Runbook；
+- [`config/ai-deploy-params.example.yaml`](config/ai-deploy-params.example.yaml) —— 用户只需补充实际部署参数。
+
+推荐直接给 AI：
+
+```text
+请读取本仓库 AGENTS.md、docs/AI_DEPLOYMENT_RUNBOOK.md
+和 config/ai-deploy-params.example.yaml。
+
+使用我提供的参数按 Runbook 部署 Ops Guard。
+已有参数不要重复问；只询问缺少且不能使用安全默认值的参数。
+第一次必须保持 auto_execute_on_approval=false，
+先完成 approval-only smoke test，再按参数决定是否开启自动执行。
+禁止把 secret 提交 Git，禁止 privileged / Docker Socket / 通用 sudo，
+不得跳过 DingTalk 人工审批。
+
+参数：
+<粘贴参数>
+```
+
 ## Hermes + DingTalk 同窗口审批配置
 
 详细步骤见：[`docs/HERMES_DINGTALK.md`](docs/HERMES_DINGTALK.md)。
@@ -381,7 +406,7 @@ mode = "webhook"
 PYTHONPATH=src python -m unittest discover -s tests -v
 ```
 
-v0.2.1 当前回归集：`51 tests`。
+v0.2.2 当前回归集：`51 tests`。
 
 覆盖包括：
 
@@ -400,6 +425,9 @@ v0.2.1 当前回归集：`51 tests`。
 
 ## 重要文档
 
+- `AGENTS.md`
+- `docs/AI_DEPLOYMENT_RUNBOOK.md`
+- `config/ai-deploy-params.example.yaml`
 - `docs/ARCHITECTURE.md`
 - `docs/HERMES_DINGTALK.md`
 - `docs/SECURITY_MODEL.md`
